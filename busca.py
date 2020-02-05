@@ -32,7 +32,7 @@ map_maze = {
         'point': (9, 1)
     },
     'I': {
-        'adjacent': [('E', 6), ('J', 2)],
+        'adjacent': [('E', 6), ('J', 2), ('H', 3)],
         'point': (9, 4)
     },
     'J': {
@@ -89,40 +89,49 @@ exit = 'Q'
 
 
 def search_generic(map, destiny):
-    state = list(map.keys())[0]
-    visiteds = [state]
-    control = map[state]['adjacent'][:]
+    sequence = []
+    initial = state = list(map.keys())[0]
+    visiteds = {initial: 0}
+    control = map[initial]['adjacent'][:]
 
     while len(control) > 0:
-        adjs = map[state]['adjacent']
+        adjs = [i for i in control if i[0] not in visiteds]
+
         position = -1
-
         for i, adj in enumerate(adjs):
-            if adj[0] in visiteds:
-                continue
-
             if i == 0:
                 position = i
             else:
-                if adj[1] < adjs[position][1]:
+                if (visiteds[state] + adj[1]) < (visiteds[state] + adjs[position][1]):
                     position = i
+        visited = adjs[position]
 
-        visited = map[state]['adjacent'][position]
-        visiteds.append(visited[0])
+        sequence.append((visited[0], visited[1]))
+
+        if initial == state:
+            visiteds[visited[0]] = visited[1] + visiteds[initial]
+        else:
+            visiteds[visited[0]] = visited[1] + visiteds[control[position][2]]
+
         control.remove(visited)
 
         state = adjs[position][0]
 
         if state == destiny:
-            return
+            return sequence
 
         values = map[state]['adjacent']
         for v in values:
             if v[0] not in visiteds:
-                control.append(v)
+                control.append([v[0], v[1], state])
 
-    return visiteds
+    return sequence
 
 
-way = search_generic(map_maze, exit)
-print(way)
+result = search_generic(map_maze, exit)
+total = 0
+for map in result:
+    print(map[0], end=" → ")
+    total += map[1]
+print("FINISH")
+print(f"Total: {total}")
