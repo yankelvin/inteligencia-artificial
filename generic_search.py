@@ -114,6 +114,7 @@ def generic_search(map, first_state, objective_state, type):
     }
 
     not_visited = []
+    destiny_point = map[objective_state]['point']
 
     while state_ != objective_state:
         not_visited.extend(get_adjacent_not_visited(state_, visited, map))
@@ -123,6 +124,12 @@ def generic_search(map, first_state, objective_state, type):
                 selected_state = random.choice(not_visited)
             elif type == 1:
                 selected_state = uniform_cost(not_visited, control)
+            elif type == 2:
+                selected_state = greedy(
+                    not_visited, control, destiny_point, map)
+            elif type == 3:
+                selected_state = a_star(
+                    not_visited, control, destiny_point, map)
 
             state_ = selected_state[0]
             value_ = selected_state[1]
@@ -134,6 +141,7 @@ def generic_search(map, first_state, objective_state, type):
                 'sequence':  control[selected_state[2]]['sequence'][:],
                 'cost': value_ + control[selected_state[2]]['cost']
             }
+
             control[state_]['sequence'].append(state_)
 
             not_visited.remove(selected_state)
@@ -153,14 +161,58 @@ def uniform_cost(states, control):
         return states[0]
 
     for s in states:
-        if (control[s[2]]['cost'] + s[1]) < (control[less_state[2]]['cost'] + less_value):
+        s_cost = control[s[2]]['cost'] + s[1]
+        less_cost = control[less_state[2]]['cost'] + less_value
+        if s_cost < less_cost:
             less_value = s[1]
             less_state = s
 
     return less_state
 
 
-# Type = 0 (Random) | Type = 1 (Uniform Cost)
+def greedy(states, control, destiny, map):
+    less_value = float('Inf')
+    less_state = states[0]
+
+    if len(states) == 1:
+        return states[0]
+
+    for s in states:
+        s_point = map[s[0]]['point']
+
+        dist = ((destiny[0] - s_point[0])**2 +
+                (destiny[1] - s_point[1])**2)**(0.5)
+
+        if dist < less_value:
+            less_value = dist
+            less_state = s
+
+    return less_state
+
+
+def a_star(states, control, destiny, map):
+    less_value = float('Inf')
+    less_state = states[0]
+
+    if len(states) == 1:
+        return states[0]
+
+    for s in states:
+        s_point = map[s[0]]['point']
+        less_cost = control[less_state[2]]['cost'] + less_value
+
+        s_cost = control[s[2]]['cost'] + s[1]
+        dist = ((destiny[0] - s_point[0])**2 +
+                (destiny[1] - s_point[1])**2)**(0.5)
+
+        if (s_cost + dist) < (less_cost + less_value):
+            less_value = dist
+            less_state = s
+
+    return less_state
+
+
+# Type = 0 (Random) | 1 (Uniform Cost) | 2 (Greedy) | 3 (A-Star)
 result = generic_search(map_maze, 'A', 'Q', type=1)
 
 print(f"Caminho resultante: {result['sequence']}")
