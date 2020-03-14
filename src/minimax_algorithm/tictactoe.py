@@ -10,7 +10,7 @@ def tictactoe_tree(state, round):
         tree["winner"] = 1
         return tree
     elif flag == 2:
-        tree["winner"] = 2
+        tree["winner"] = -1
         return tree
 
     moves = generate_moves(state, round)

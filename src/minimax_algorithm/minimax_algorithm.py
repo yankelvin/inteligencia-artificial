@@ -1,31 +1,38 @@
 from tictactoe import get_data
 
-
-def minimax_decision(state):
-    # if terminal_test(state):
-    #     return utility(state)
-
-    v = float("inf")
-
-    # for a in actions(state):
-    #     v = max(v, max_value(result(state, a)))
-
-    return v
+data = get_data()
 
 
-def max_value(state):
-    # if terminal_test(state):
-    #     return utility(state)
+def search(node, tree):
+    if node["state"] == tree["state"]:
+        return tree
 
-    v = float("-inf")
+    for m in tree["moves"]:
+        if node["state"] == m["state"]:
+            return m
 
-    # for a in actions(state):
-    #     v = max(v, min_value(result(state, a)))
-    return v
-
-
-def min_value(state):
-    return
+    for m in node["moves"]:
+        search(m, tree)
 
 
-print(get_data())
+def minimax(node, round):
+    find = search(node, data)
+
+    if len(find["moves"]) == 0:
+        return find["winner"]
+    elif round % 2 == 0:
+        a = float("inf")
+        for m in find["moves"]:
+            a = min(a, minimax(m, round + 1))
+        return a
+    else:
+        a = float("-inf")
+        for m in find["moves"]:
+            a = max(a, minimax(m, round + 1))
+        return a
+
+
+tree = {"state": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "moves": [], "winner": 0}
+resp = minimax(tree, 1)
+print(resp)
