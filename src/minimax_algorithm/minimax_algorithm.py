@@ -1,38 +1,49 @@
-from tictactoe import get_data
+from tictactoe import get_data, win
 
 data = get_data()
 
 
-def search(node, tree):
-    if node["state"] == tree["state"]:
+def search(state, tree):
+    if state["state"] == tree["state"]:
         return tree
 
     for m in tree["moves"]:
-        if node["state"] == m["state"]:
+        if state["state"] == m["state"]:
             return m
 
-    for m in node["moves"]:
-        search(m, tree)
+    for m in tree["moves"]:
+        return search(m, tree)
 
 
-def minimax(node, round):
-    find = search(node, data)
+def max_value(state):
+    if win(state["state"]) != 0:
+        return state
 
-    if len(find["moves"]) == 0:
-        return find["winner"]
-    elif round % 2 == 0:
-        a = float("inf")
-        for m in find["moves"]:
-            a = min(a, minimax(m, round + 1))
-        return a
-    else:
-        a = float("-inf")
-        for m in find["moves"]:
-            a = max(a, minimax(m, round + 1))
-        return a
+    v = float("inf")
+    for m in state["moves"]:
+        result = min_value(m)
+        v = min(v, result["winner"])
+    return {"winner": v, "tree": state}
 
 
-tree = {"state": [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "moves": [], "winner": 0}
-resp = minimax(tree, 1)
-print(resp)
+def min_value(state):
+    winner = win(state["state"])
+    if winner != 0:
+        return {"winner": winner, "tree": state}
+
+    v = float("-inf")
+    for m in state["moves"]:
+        result = max_value(m)
+        v = max(v, result["winner"])
+    return {"winner": v, "tree": state}
+
+
+def minimax(state):
+    find = search(state, data)
+
+    return min_value(find)
+
+
+tree = {"state": [1, 0, 1, 0, 2, 0, 2, 0, 0]}
+result = minimax(tree)
+print(result)
