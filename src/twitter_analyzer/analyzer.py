@@ -64,10 +64,10 @@ class MyStreamer(TwythonStreamer):
 
 
 # Definição das chaves da API do Twitter
-consumer_key = "atmarKZPN23ATHFLIqZH9Ezfi"
-consumer_secret = "S72tbc7WfZN1NffCQxbepeqIWhCmxA6vTR1fENsFqPw9616Txu"
-access_token = "3968788457-ZNc77eDdGp8gTlSJzXGpSPCI4ajXwpK3SSg4gw4"
-access_token_secret = "gvzMDnf7qKrBIxau6pWB78NWBGouB4zBtfpt8kle4q8UW"
+consumer_key = ""
+consumer_secret = ""
+access_token = ""
+access_token_secret = ""
 
 
 # E criamos nossa instância do coletor
